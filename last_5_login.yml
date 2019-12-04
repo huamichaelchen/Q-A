@@ -1,0 +1,10 @@
+---
+
+- hosts: all
+  remote_user: root
+
+  tasks:
+    - name: find last 5 successful logins 
+      command: last -5
+      async: 45
+      poll: 0

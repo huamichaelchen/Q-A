@@ -37,7 +37,6 @@ user@ip
 1. `./build.sh`
 2. `./run.sh`
 3. `./tomfinder.py -f test.log -s localhost`
-4. `echo */5 * * * * `
 
 
 ### Q3: 
@@ -46,6 +45,7 @@ The purposes of the script was to find the following information:
 2. Network Interface Controller
 3. MAC address
 4. Hostname
+
 by creating 4 session variables and echo them out in the end.
 
 
@@ -164,6 +164,9 @@ MySQL or similar RDBMS store data as a `tables` of `columns` and `rows`, but ess
 
 
 ### Q1
+
+> This [OSQuery](https://osquery.io/) thing looks pretty cool as well ;) 
+
 Possible bottlenecks. 
 
 1. Server status
@@ -173,23 +176,48 @@ A quick `uptime` would've given me a glimps into how many users are logged on an
 
 For a much detailed real-time system status, I'd run `htop` or `top` to find out the exact CPU and RAM usage of the server.
 
+On the network side, I'd run `iftop` to see ins-and-outs of all connections and its usage.
+
 
 2. Apache configs
+Check how many connections are connecting to the server through Apache right now with `sudo systemctl status -l httpd`
 
+Check certain Apache configs to see if they are in an optimal state.
+
+* Keep Alive Timeout (supposedly to be recommended between 1-5)
+* Max Keep-Alive Requests (supposedly to be recommended around 500)
+* Make sure `KeepAlive` is `On`
+* Make sure multi-processing module is turned on with `sudo apachectl -t -D DUMP_MODULES |grep mpm`
+* See if `HostnameLookups` is `On` or `Off`. It should be on so the midware won't spend extra resources jut to get a DNS name back each time.
+
+All these configurations can be found in `/etc/httpd/conf`
 
 3. MySQL performance
-
-
+Use `mysqladmin proc stat` to log into the database and check a summary of how many `threads` are running, how many `opening` connections, and even number of `Slow queries`. 
+Use `mysqldumpslow` to find the specific slow queries 
 
 
 ### Q2
-
-
+1. SSL everywhere, ideally even within the company's network
+2. Encrypt everything, everywhere. 
+3. Firewall and IP whitelisting and filtering
 
 ### Q3
-
+I'm not quite sure about the question, if the system is already in high load in production, then debugging a live application that's running in that hammered production environment is probably not a good idea. But I guess, I could do a `ps -elf` or `ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head` to find the high load, but non-application critical processes and kill them. Then start perusing the application logs to find where it went wrong. Potentially, even bring up another instance of the same application in a different server to see what's going on? Perhaps scale the application horizontally first before doing anything further just in case the application may crash anytime. 
 
 ### Q4
 
+**Purly from IP's perspective**
+
+1. Try `ping` from a few different servers in the same network space to see if areas other than the known unreachable servers can still communicate with the server to be checked. 
+2. If luckily I found a server that I can still `ping` the "unreachable" servers, I will do a `traceroute` or `mtr` to that server from a server that can still talk to it, so that I can observe the routing table. Similarly, I would run `traceroute` or `mtr` on the certain areas that cannot reach this "unreachable" server, to see where the connection falls off. 
+3. Adding the missing route *temporarily* to see if that would resolve the issue `ip route add missingRouteIP via someGateWayIP dev eth0`
+4. Then modify `/etc/sysconfig/network-scripts/` with `missingRouteIP via someGateWayIP dev someInterface` 
 
 
+**Now considering DNS**
+Perhaps the server is reachable through IP not through FQDN. Then it's very likely to be an DNS issue. 
+
+1. Check `/etc/resolv.conf` to see which DNS server those certain parts of the network that cannot reach to the servers are using. 
+2. Validate from a healthy server to see if those DNS server names are valid. 
+3. If they are not, fix it. But if they are, then follow the "IP's perspective" section above to troubleshoot what's going on with our DNS servers. 

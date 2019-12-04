@@ -3,12 +3,14 @@
 ### Q1: 
 
 Option 1): Python script
+
 0. `assumption all the remote connections have been setup, aka SSH keys`
 1. `pip install parallel-ssh`
 2. `python last_5_log.py -f hostFilePath`
 
 
 Option 2): Ansbile playbook
+
 `ansible-playbook -i yourInventory last_5_login.yml`
 
 **or if no SSH key setup, you can use password as well**
@@ -40,6 +42,7 @@ user@ip
 
 
 ### Q3: 
+
 The purposes of the script was to find the following information: 
 1. IP
 2. Network Interface Controller
@@ -94,12 +97,14 @@ My typical workflow:
 --Now it is merging time, and assuming it has been a while--
 
 Option 1):
+
 1. `git add .` # or `git add onlyTheStuffIWant`
 2. `git commit -m 'some stuff, obviously more meaningful when it is real work'`
 3. `git push remoteOriginName myFeatureBranch` # in case there are multiple upstream
 4. `create PR`
 
 Option 2):
+
 1. `git checkout master && git pull`
 2. `git checkout myFeatureBranch`
 3. `git rebase -i master`  # drop/pick/etc
@@ -108,6 +113,7 @@ Option 2):
 6. `create PR`
 
 Option 3):
+
 1. `git checkout master && git pull`
 2. `git checkout myFeatureBranch`
 3. `git merge master`     # resolve conflicts if any
@@ -170,6 +176,7 @@ MySQL or similar RDBMS store data as a `tables` of `columns` and `rows`, but ess
 Possible bottlenecks. 
 
 1. Server status
+
 First thing first, I want to see if the underlying hardware/VM is healthy or not. 
 
 A quick `uptime` would've given me a glimps into how many users are logged on and load-average trend so that I can have a quick estimate of how long has this been happening. 
@@ -180,6 +187,7 @@ On the network side, I'd run `iftop` to see ins-and-outs of all connections and 
 
 
 2. Apache configs
+
 Check how many connections are connecting to the server through Apache right now with `sudo systemctl status -l httpd`
 
 Check certain Apache configs to see if they are in an optimal state.
@@ -193,16 +201,19 @@ Check certain Apache configs to see if they are in an optimal state.
 All these configurations can be found in `/etc/httpd/conf`
 
 3. MySQL performance
+
 Use `mysqladmin proc stat` to log into the database and check a summary of how many `threads` are running, how many `opening` connections, and even number of `Slow queries`. 
 Use `mysqldumpslow` to find the specific slow queries 
 
 
 ### Q2
+
 1. SSL everywhere, ideally even within the company's network
 2. Encrypt everything, everywhere. 
 3. Firewall and IP whitelisting and filtering
 
 ### Q3
+
 I'm not quite sure about the question, if the system is already in high load in production, then debugging a live application that's running in that hammered production environment is probably not a good idea. But I guess, I could do a `ps -elf` or `ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head` to find the high load, but non-application critical processes and kill them. Then start perusing the application logs to find where it went wrong. Potentially, even bring up another instance of the same application in a different server to see what's going on? Perhaps scale the application horizontally first before doing anything further just in case the application may crash anytime. 
 
 ### Q4

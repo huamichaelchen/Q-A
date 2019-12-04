@@ -37,6 +37,7 @@ user@ip
 1. `./build.sh`
 2. `./run.sh`
 3. `./tomfinder.py -f test.log -s localhost`
+4. `echo */5 * * * * `
 
 
 ### Q3: 
@@ -163,6 +164,21 @@ MySQL or similar RDBMS store data as a `tables` of `columns` and `rows`, but ess
 
 
 ### Q1
+Possible bottlenecks. 
+
+1. Server status
+First thing first, I want to see if the underlying hardware/VM is healthy or not. 
+
+A quick `uptime` would've given me a glimps into how many users are logged on and load-average trend so that I can have a quick estimate of how long has this been happening. 
+
+For a much detailed real-time system status, I'd run `htop` or `top` to find out the exact CPU and RAM usage of the server.
+
+
+2. Apache configs
+
+
+3. MySQL performance
+
 
 
 
